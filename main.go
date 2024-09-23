@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -23,9 +23,9 @@ type SQSMessageBody struct {
 }
 
 type ApiResponse struct {
-	Name    string                `json:"name"`
-	Headers []string              `json:"headers"`
-	Data    [][]map[string]string `json:"data"`
+	Name    string                   `json:"name"`
+	Headers []string                 `json:"headers"`
+	Data    []map[string]interface{} `json:"data"`
 }
 
 var (
@@ -51,7 +51,7 @@ func handler(sqsEvent events.SQSEvent) error {
 		}
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			log.Printf("Failed to read API response: %v", err)
 			return err
@@ -65,8 +65,7 @@ func handler(sqsEvent events.SQSEvent) error {
 
 		// Step 2: Write data to an Excel file in memory
 		var buf bytes.Buffer
-		batchSize := 1000
-		if err := excelwriter.WriteToExcelFile(apiResponse.Headers, apiResponse.Data, batchSize, &buf); err != nil {
+		if err := excelwriter.WriteToExcelFile(apiResponse.Headers, apiResponse.Data, &buf); err != nil {
 			log.Printf("Failed to write Excel file: %v", err)
 			return err
 		}
