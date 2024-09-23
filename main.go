@@ -43,8 +43,15 @@ func handler(sqsEvent events.SQSEvent) error {
 		}
 
 		// Step 1: Call the Nest.js API using query filters
-		fullAPIURL := fmt.Sprintf("%s?%s", apiURL, buildQueryParams(msgBody.Filters))
-		resp, err := http.Get(fullAPIURL)
+
+		jsonData, err := json.Marshal(msgBody.Filters)
+		if err != nil {
+			log.Printf("Failed to marshal filters to JSON: %v", err)
+			return err
+		}
+
+		resp, err := http.Post(apiURL, "application/json", bytes.NewReader(jsonData))
+
 		if err != nil {
 			log.Printf("Failed to fetch data from API: %v", err)
 			return err
@@ -87,18 +94,6 @@ func handler(sqsEvent events.SQSEvent) error {
 		log.Printf("Successfully processed message for %s", msgBody.Email)
 	}
 	return nil
-}
-
-// buildQueryParams constructs the query string from filters
-func buildQueryParams(filters map[string]string) string {
-	query := ""
-	for key, value := range filters {
-		if query != "" {
-			query += "&"
-		}
-		query += fmt.Sprintf("%s=%s", key, value)
-	}
-	return query
 }
 
 func main() {
