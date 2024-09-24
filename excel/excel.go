@@ -24,6 +24,13 @@ func WriteToExcelFile(headers []string, data []map[string]interface{}, writer io
 		return err
 	}
 
+	headerRow := make([]interface{}, len(headers))
+	for i, header := range headers {
+		headerRow[i] = header
+	}
+
+	sw.SetRow("A1", headerRow)
+
 	// Write data using sw
 	for rowIndex, rowData := range data {
 		row := make([]interface{}, len(headers))

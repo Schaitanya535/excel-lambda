@@ -44,16 +44,16 @@ func TestWriteToExcelFile(t *testing.T) {
 	}
 
 	sheetName := "Sheet1"
-	// for i, header := range headers {
-	// 	cell := fmt.Sprintf("%c1", 'A'+i)
-	// 	value, err := f.GetCellValue(sheetName, cell)
-	// 	if err != nil {
-	// 		t.Fatalf("expected no error getting cell value, got %v", err)
-	// 	}
-	// 	if value != header {
-	// 		t.Errorf("expected header %s, got %s", header, value)
-	// 	}
-	// }
+	for i, header := range headers {
+		cell := fmt.Sprintf("%c1", 'A'+i)
+		value, err := f.GetCellValue(sheetName, cell)
+		if err != nil {
+			t.Fatalf("expected no error getting cell value, got %v", err)
+		}
+		if value != header {
+			t.Errorf("expected header %s, got %s", header, value)
+		}
+	}
 
 	for rowIndex, rowData := range data {
 		for colIndex, header := range headers {
